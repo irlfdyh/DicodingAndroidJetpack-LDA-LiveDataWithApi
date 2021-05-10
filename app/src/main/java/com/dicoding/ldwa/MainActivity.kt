@@ -1,8 +1,11 @@
 package com.dicoding.ldwa
 
+import android.content.Context
+import android.inputmethodservice.InputMethodService
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
@@ -42,6 +45,16 @@ class MainActivity : AppCompatActivity() {
                 if (loading) View.VISIBLE else View.GONE
         })
 
+        activityMainBinding.btnSend.setOnClickListener { view ->
+            mainViewModel.postReview(activityMainBinding.edReview.text.toString())
+            hideKeyboard(view)
+        }
 
     }
+
+    private fun hideKeyboard(view: View) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
 }

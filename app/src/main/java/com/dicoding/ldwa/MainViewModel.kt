@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dicoding.ldwa.api.ApiConfig
 import com.dicoding.ldwa.model.CustomerReviewItems
+import com.dicoding.ldwa.model.PostReviewResponse
 import com.dicoding.ldwa.model.Restaurant
 import com.dicoding.ldwa.model.RestaurantResponse
 import retrofit2.Call
@@ -32,7 +33,7 @@ class MainViewModel : ViewModel() {
         findRestaurant()
     }
 
-    fun findRestaurant() {
+    private fun findRestaurant() {
         _isLoading.value = true
         val client = ApiConfig.getApiService().getRestaurant(RESTAURANT_ID)
         client.enqueue(object : Callback<RestaurantResponse> {
@@ -55,6 +56,28 @@ class MainViewModel : ViewModel() {
                 Log.e(TAG, "onFailure: ${t.message.toString()}")
             }
 
+        })
+    }
+
+    fun postReview(review: String) {
+        _isLoading.value = true
+        val client = ApiConfig.getApiService().postReview(RESTAURANT_ID, "Dicoding", review)
+        client.enqueue(object : Callback<PostReviewResponse> {
+            override fun onResponse(
+                call: Call<PostReviewResponse>,
+                response: Response<PostReviewResponse>
+            ) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    _listReview.value = response.body()?.customerReviews
+                } else {
+                    Log.e(TAG, "onFailure: ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<PostReviewResponse>, t: Throwable) {
+                _isLoading.value = false
+                Log.e(TAG, "onFailure: ${t.message.toString()}")
+            }
         })
     }
 
